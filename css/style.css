@@ -1,0 +1,102 @@
+/* ============================================================
+   OpenVidu Integration – App Styles
+   ============================================================ */
+
+/* ---- Layout ---- */
+.app-openviduintegration #app-content-wrapper {
+	padding: 20px;
+}
+
+/* ---- Create-room form ---- */
+.openvidu-create-room {
+	margin-bottom: 24px;
+}
+
+.openvidu-form {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.openvidu-form input[type='text'] {
+	flex: 1;
+	max-width: 360px;
+}
+
+/* ---- Room list ---- */
+.openvidu-rooms {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.openvidu-room-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--color-border, #ededed);
+	transition: background-color 0.15s;
+}
+
+.openvidu-room-item:hover {
+	background-color: var(--color-background-hover, #f5f5f5);
+}
+
+.openvidu-room-name {
+	font-size: 1em;
+	font-weight: 500;
+}
+
+.openvidu-room-actions {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* ---- Room embed view ---- */
+.openvidu-room-view {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 0;
+}
+
+.openvidu-room-header {
+	padding: 12px 20px;
+	border-bottom: 1px solid var(--color-border, #ededed);
+	flex-shrink: 0;
+}
+
+.openvidu-room-header h2 {
+	margin: 0;
+}
+
+#openvidu-meet-frame {
+	flex: 1;
+	border: none;
+	width: 100%;
+	height: 100%;
+	min-height: calc(100vh - 100px);
+}
+
+/* ---- Admin settings ---- */
+#openviduintegration-admin .openvidu-admin-row {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 20px;
+	max-width: 480px;
+}
+
+#openviduintegration-admin label {
+	font-weight: 600;
+}
+
+#openviduintegration-admin input[type='url'] {
+	width: 100%;
+}
+
+/* Status messages */
+#openviduintegration-admin-msg.success { color: var(--color-success, #46ba61); }
+#openviduintegration-admin-msg.error   { color: var(--color-error,   #e9322d); }

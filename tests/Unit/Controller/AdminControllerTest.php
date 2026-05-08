@@ -1,0 +1,116 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OCA\OpenViduIntegration\Tests\Unit\Controller;
+
+use OCA\OpenViduIntegration\Controller\AdminController;
+use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\DataResponse;
+use OCP\IConfig;
+use OCP\IRequest;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+
+/**
+ * Unit tests for AdminController.
+ */
+class AdminControllerTest extends TestCase {
+	private AdminController $controller;
+
+	/** @var IConfig&MockObject */
+	private IConfig $config;
+
+	protected function setUp(): void {
+		$request        = $this->createMock(IRequest::class);
+		$this->config   = $this->createMock(IConfig::class);
+
+		$this->controller = new AdminController($request, $this->config);
+	}
+
+	// -----------------------------------------------------------------------
+	// saveSettings()
+	// -----------------------------------------------------------------------
+
+	public function testSaveSettingsReturns200OnValidUrl(): void {
+		$this->config->expects($this->once())
+			->method('setAppValue')
+			->with('openviduintegration', 'openvidu_meet_url', 'https://meet.example.com');
+
+		$response = $this->controller->saveSettings('https://meet.example.com');
+
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+
+	public function testSaveSettingsReturnsNormalizedUrl(): void {
+		$this->config->method('setAppValue');
+
+		$data = $this->controller->saveSettings('https://meet.example.com/')->getData();
+
+		// Trailing slash should be stripped
+		$this->assertSame('https://meet.example.com', $data['openvidu_meet_url']);
+	}
+
+	public function testSaveSettingsAllowsEmptyUrl(): void {
+		$this->config->expects($this->once())
+			->method('setAppValue')
+			->with('openviduintegration', 'openvidu_meet_url', '');
+
+		$response = $this->controller->saveSettings('');
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+
+	public function testSaveSettingsReturns400ForInvalidUrl(): void {
+		$this->config->expects($this->never())->method('setAppValue');
+
+		$response = $this->controller->saveSettings('not-a-url');
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+		$this->assertArrayHasKey('error', $response->getData());
+	}
+
+	public function testSaveSettingsTrimsWhitespace(): void {
+		$captured = null;
+		$this->config->method('setAppValue')
+			->willReturnCallback(function (string $app, string $key, string $value) use (&$captured) {
+				$captured = $value;
+			});
+
+		$this->controller->saveSettings('  https://meet.example.com  ');
+
+		$this->assertSame('https://meet.example.com', $captured);
+	}
+
+	public function testSaveSettingsReturnsStoredUrl(): void {
+		$this->config->method('setAppValue');
+
+		$data = $this->controller->saveSettings('https://my-meet.example.org')->getData();
+
+		$this->assertSame('https://my-meet.example.org', $data['openvidu_meet_url']);
+	}
+
+	public function testSaveSettingsRejectsJavascriptScheme(): void {
+		$this->config->expects($this->never())->method('setAppValue');
+
+		// javascript: URLs must be rejected by filter_var(FILTER_VALIDATE_URL)
+		$response = $this->controller->saveSettings('javascript:alert(1)');
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+	}
+
+	public function testSaveSettingsAcceptsHttpsUrl(): void {
+		$this->config->method('setAppValue');
+
+		$response = $this->controller->saveSettings('https://secure.example.com');
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+
+	public function testSaveSettingsAcceptsHttpUrl(): void {
+		$this->config->method('setAppValue');
+
+		$response = $this->controller->saveSettings('http://internal.lan');
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+	}
+}
