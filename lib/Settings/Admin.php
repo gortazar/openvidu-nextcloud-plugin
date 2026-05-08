@@ -28,11 +28,19 @@ class Admin implements ISettings {
 			'openvidu_meet_url',
 			''
 		);
+		$openViduApiKey = $this->config->getAppValue(
+			Application::APP_ID,
+			'openvidu_api_key',
+			''
+		);
 
 		return new TemplateResponse(
 			Application::APP_ID,
 			'admin',
-			['openvidu_meet_url' => $openViduMeetUrl],
+			[
+				'openvidu_meet_url' => $openViduMeetUrl,
+				'openvidu_api_key'  => $openViduApiKey,
+			],
 			TemplateResponse::RENDER_AS_BLANK
 		);
 	}

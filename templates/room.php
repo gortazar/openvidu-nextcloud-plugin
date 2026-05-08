@@ -7,8 +7,18 @@ style('openviduintegration', 'style');
 
 $roomName = $_['room']['name'] ?? $_['token'];
 $meetUrl  = rtrim($_['openViduMeetUrl'], '/');
+$apiKey   = $_['openViduApiKey'] ?? '';
+
 // Build the embed URL: <OpenViduMeetUrl>/<token>
-$iframeSrc = $meetUrl !== '' ? $meetUrl . '/' . urlencode($_['token']) : '';
+// OpenVidu Meet v3 requires the API key to be supplied as the `token` query
+// parameter so that the embedded page can authenticate with the OpenVidu server.
+$iframeSrc = '';
+if ($meetUrl !== '') {
+	$iframeSrc = $meetUrl . '/' . urlencode($_['token']);
+	if ($apiKey !== '') {
+		$iframeSrc .= '?token=' . urlencode($apiKey);
+	}
+}
 ?>
 
 <div id="app" class="app-openviduintegration">
