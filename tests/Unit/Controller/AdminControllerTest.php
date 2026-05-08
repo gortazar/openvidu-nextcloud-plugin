@@ -94,8 +94,18 @@ class AdminControllerTest extends TestCase {
 	public function testSaveSettingsRejectsJavascriptScheme(): void {
 		$this->config->expects($this->never())->method('setAppValue');
 
-		// javascript: URLs must be rejected by filter_var(FILTER_VALIDATE_URL)
+		// javascript: is not a valid URL per filter_var
 		$response = $this->controller->saveSettings('javascript:alert(1)');
+
+		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
+	}
+
+	public function testSaveSettingsRejectsFtpScheme(): void {
+		$this->config->expects($this->never())->method('setAppValue');
+
+		// ftp:// passes filter_var(FILTER_VALIDATE_URL) but must be rejected
+		// by the explicit http/https scheme check.
+		$response = $this->controller->saveSettings('ftp://files.example.com');
 
 		$this->assertSame(Http::STATUS_BAD_REQUEST, $response->getStatus());
 	}

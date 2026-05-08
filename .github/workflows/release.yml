@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # required to create releases and upload assets
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract app version
+        id: version
+        run: |
+          VERSION=$(grep -oP '(?<=<version>)[^<]+' appinfo/info.xml | head -1)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: composer:v2
+
+      - name: Install production dependencies & build package
+        run: make package
+
+      - name: Locate release asset
+        id: package
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          APP_ID="openviduintegration"
+          ASSET_PATH="build/${APP_ID}.zip"
+          ASSET_NAME="${APP_ID}-${VERSION}.zip"
+          # Rename to include the version in the file name
+          mv "${ASSET_PATH}" "build/${ASSET_NAME}"
+          echo "asset_path=build/${ASSET_NAME}" >> "$GITHUB_OUTPUT"
+          echo "asset_name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}-build.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.package.outputs.tag }}
+          name: "OpenVidu Integration v${{ steps.version.outputs.version }} (build ${{ github.run_number }})"
+          body: |
+            Automated release from commit ${{ github.sha }}.
+
+            ## Installation
+            1. Download `${{ steps.package.outputs.asset_name }}` below.
+            2. Extract it into your Nextcloud `apps/` directory.
+            3. Enable the app: `occ app:enable openviduintegration`
+            4. In the Nextcloud admin panel, go to **OpenVidu Integration** and set the OpenVidu Meet server URL.
+          files: ${{ steps.package.outputs.asset_path }}
+          generate_release_notes: true

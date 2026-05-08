@@ -91,9 +91,9 @@ style('openviduintegration', 'style');
 	/* Pass server-side data to our JS module. */
 	window.OCA = window.OCA || {};
 	window.OCA.OpenViduIntegration = {
-		openViduMeetUrl: <?php echo json_encode($_['openViduMeetUrl']); ?>,
-		userId: <?php echo json_encode($_['userId']); ?>,
-		initialRooms: <?php echo json_encode($_['rooms']); ?>,
+		openViduMeetUrl: <?php echo json_encode($_['openViduMeetUrl'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+		userId: <?php echo json_encode($_['userId'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
+		initialRooms: <?php echo json_encode($_['rooms'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>,
 		createRoomUrl: OC.generateUrl('/apps/openviduintegration/api/rooms'),
 		deleteRoomUrl: OC.generateUrl('/apps/openviduintegration/api/rooms'),
 		roomBaseUrl: OC.generateUrl('/apps/openviduintegration/room'),

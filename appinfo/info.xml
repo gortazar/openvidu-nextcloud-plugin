@@ -16,8 +16,8 @@ Features:
 * Admin settings for the OpenVidu Meet server URL
 	]]></description>
 	<version>1.0.0</version>
-	<licence>agpl</licence>
-	<author mail="gortazar@gmail.com">Gorka Eguileor</author>
+	<licence>apache</licence>
+	<author mail="francisco.gortazar@urjc.es">Patxi Gortázar</author>
 	<namespace>OpenViduIntegration</namespace>
 	<category>tools</category>
 	<website>https://github.com/gortazar/openvidu-nextcloud-plugin</website>

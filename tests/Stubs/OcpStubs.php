@@ -99,6 +99,14 @@ namespace OCP\AppFramework\Db {
 
 namespace OCP\DB\QueryBuilder {
 	interface IQueryBuilder {
+		/** Type constants mirroring Nextcloud's IQueryBuilder. */
+		public const PARAM_STR  = \PDO::PARAM_STR;
+		public const PARAM_INT  = \PDO::PARAM_INT;
+		public const PARAM_BOOL = \PDO::PARAM_BOOL;
+		public const PARAM_NULL = \PDO::PARAM_NULL;
+		public const PARAM_STR_ARRAY  = 101;
+		public const PARAM_INT_ARRAY  = 102;
+
 		public function select(mixed ...$selects): static;
 		public function from(string $table, ?string $alias = null): static;
 		public function where(mixed $predicate): static;
