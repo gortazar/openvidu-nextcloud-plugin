@@ -2,11 +2,11 @@
 	"name": "gortazar/openviduintegration",
 	"description": "Nextcloud app: embed OpenVidu Meet video-conferencing rooms",
 	"type": "nextcloud-app",
-	"license": "AGPL-3.0-or-later",
+	"license": "Apache-2.0",
 	"authors": [
 		{
-			"name": "Gorka Eguileor",
-			"email": "gortazar@gmail.com"
+			"name": "Patxi Gortázar",
+			"email": "francisco.gortazar@urjc.es"
 		}
 	],
 	"require": {

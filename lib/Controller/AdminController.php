@@ -37,13 +37,22 @@ class AdminController extends Controller {
 	public function saveSettings(string $openvidu_meet_url = ''): DataResponse {
 		$url = trim($openvidu_meet_url);
 
-		// Basic URL validation: must be empty (clearing the value is allowed)
-		// or a valid http(s) URL.
-		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
-			return new DataResponse(
-				['error' => 'Invalid URL'],
-				\OCP\AppFramework\Http::STATUS_BAD_REQUEST
-			);
+		if ($url !== '') {
+			// Must be a syntactically valid URL …
+			if (!filter_var($url, FILTER_VALIDATE_URL)) {
+				return new DataResponse(
+					['error' => 'Invalid URL'],
+					\OCP\AppFramework\Http::STATUS_BAD_REQUEST
+				);
+			}
+			// … and restricted to http / https to prevent javascript:, ftp:, etc.
+			$scheme = parse_url($url, PHP_URL_SCHEME);
+			if (!in_array($scheme, ['http', 'https'], true)) {
+				return new DataResponse(
+					['error' => 'URL must use http or https scheme'],
+					\OCP\AppFramework\Http::STATUS_BAD_REQUEST
+				);
+			}
 		}
 
 		// Strip trailing slash so that token concatenation is always clean.

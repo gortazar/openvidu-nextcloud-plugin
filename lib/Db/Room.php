@@ -9,7 +9,7 @@ use OCP\AppFramework\Db\Entity;
 /**
  * Represents a persistent meeting room.
  *
- * @method int    getId()
+ * @method ?int   getId()
  * @method string getName()
  * @method void   setName(string $name)
  * @method string getToken()
