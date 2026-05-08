@@ -66,12 +66,18 @@ class PageController extends Controller {
 			'openvidu_meet_url',
 			''
 		);
+		$openViduApiKey = $this->config->getAppValue(
+			Application::APP_ID,
+			'openvidu_api_key',
+			''
+		);
 		$room = $this->roomService->getRoomByToken($token);
 
 		return new TemplateResponse(Application::APP_ID, 'room', [
-			'token'          => $token,
-			'room'           => $room?->toArray(),
+			'token'           => $token,
+			'room'            => $room?->toArray(),
 			'openViduMeetUrl' => $openViduMeetUrl,
+			'openViduApiKey'  => $openViduApiKey,
 		]);
 	}
 }

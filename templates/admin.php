@@ -27,6 +27,22 @@
 		</div>
 
 		<div class="openvidu-admin-row">
+			<label for="openvidu-api-key"><?php p($l->t('OpenVidu API Key')); ?></label>
+			<input
+				id="openvidu-api-key"
+				type="password"
+				name="openvidu_api_key"
+				value="<?php p($_['openvidu_api_key']); ?>"
+				placeholder="<?php p($l->t('Your OpenVidu Meet API key')); ?>"
+				autocomplete="new-password"
+				class="input-medium"
+			/>
+			<em class="settings-hint">
+				<?php p($l->t('The API key (X-API-KEY) for your OpenVidu Meet v3 server. Required to authenticate requests to OpenVidu Meet.')); ?>
+			</em>
+		</div>
+
+		<div class="openvidu-admin-row">
 			<input
 				type="submit"
 				class="button primary"
@@ -43,8 +59,9 @@
 	document.getElementById('openviduintegration-admin-form')
 		.addEventListener('submit', function (e) {
 			e.preventDefault();
-			var url = document.getElementById('openvidu-meet-url').value;
-			var msgEl = document.getElementById('openviduintegration-admin-msg');
+			var url    = document.getElementById('openvidu-meet-url').value;
+			var apiKey = document.getElementById('openvidu-api-key').value;
+			var msgEl  = document.getElementById('openviduintegration-admin-msg');
 			msgEl.classList.remove('hidden', 'success', 'error');
 
 			fetch(OC.generateUrl('/apps/openviduintegration/api/admin/settings'), {
@@ -53,7 +70,10 @@
 					'Content-Type': 'application/json',
 					'requesttoken': OC.requestToken,
 				},
-				body: JSON.stringify({ openvidu_meet_url: url }),
+				body: JSON.stringify({
+					openvidu_meet_url: url,
+					openvidu_api_key:  apiKey,
+				}),
 			})
 			.then(function (r) { return r.json(); })
 			.then(function (data) {

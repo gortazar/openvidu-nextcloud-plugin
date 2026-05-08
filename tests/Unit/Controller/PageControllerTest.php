@@ -155,6 +155,30 @@ class PageControllerTest extends TestCase {
 		$this->assertSame('tok1', $params['room']['token']);
 	}
 
+	public function testRoomPassesApiKeyToTemplate(): void {
+		$room = $this->makeRoom('tok1', 'alice');
+		$this->roomService->method('getRoomByToken')->willReturn($room);
+		$this->config->method('getAppValue')
+			->willReturnMap([
+				['openviduintegration', 'openvidu_meet_url', '', 'https://meet.example.com'],
+				['openviduintegration', 'openvidu_api_key',  '', 'super-secret'],
+			]);
+
+		$params = $this->controller->room('tok1')->getParams();
+
+		$this->assertSame('super-secret', $params['openViduApiKey']);
+	}
+
+	public function testRoomPassesEmptyApiKeyWhenNotConfigured(): void {
+		$room = $this->makeRoom('tok1', 'alice');
+		$this->roomService->method('getRoomByToken')->willReturn($room);
+		$this->config->method('getAppValue')->willReturn('');
+
+		$params = $this->controller->room('tok1')->getParams();
+
+		$this->assertSame('', $params['openViduApiKey']);
+	}
+
 	// -----------------------------------------------------------------------
 	// Helpers
 	// -----------------------------------------------------------------------

@@ -32,10 +32,18 @@ class AdminController extends Controller {
 	 * POST /api/admin/settings
 	 * Persists admin configuration.
 	 *
-	 * Expected body: { "openvidu_meet_url": "https://…" }
+	 * Expected body:
+	 *   { "openvidu_meet_url": "https://…", "openvidu_api_key": "…" }
+	 *
+	 * The API key is sent as the X-API-KEY header on every request to the
+	 * OpenVidu Meet server (OpenVidu v3 requirement).
 	 */
-	public function saveSettings(string $openvidu_meet_url = ''): DataResponse {
-		$url = trim($openvidu_meet_url);
+	public function saveSettings(
+		string $openvidu_meet_url = '',
+		string $openvidu_api_key  = '',
+	): DataResponse {
+		$url    = trim($openvidu_meet_url);
+		$apiKey = trim($openvidu_api_key);
 
 		if ($url !== '') {
 			// Must be a syntactically valid URL …
@@ -59,7 +67,11 @@ class AdminController extends Controller {
 		$url = rtrim($url, '/');
 
 		$this->config->setAppValue(Application::APP_ID, 'openvidu_meet_url', $url);
+		$this->config->setAppValue(Application::APP_ID, 'openvidu_api_key', $apiKey);
 
-		return new DataResponse(['openvidu_meet_url' => $url]);
+		return new DataResponse([
+			'openvidu_meet_url' => $url,
+			'openvidu_api_key'  => $apiKey,
+		]);
 	}
 }

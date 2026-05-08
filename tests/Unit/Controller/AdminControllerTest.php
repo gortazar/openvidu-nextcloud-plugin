@@ -33,9 +33,8 @@ class AdminControllerTest extends TestCase {
 	// -----------------------------------------------------------------------
 
 	public function testSaveSettingsReturns200OnValidUrl(): void {
-		$this->config->expects($this->once())
-			->method('setAppValue')
-			->with('openviduintegration', 'openvidu_meet_url', 'https://meet.example.com');
+		$this->config->expects($this->exactly(2))
+			->method('setAppValue');
 
 		$response = $this->controller->saveSettings('https://meet.example.com');
 
@@ -53,9 +52,8 @@ class AdminControllerTest extends TestCase {
 	}
 
 	public function testSaveSettingsAllowsEmptyUrl(): void {
-		$this->config->expects($this->once())
-			->method('setAppValue')
-			->with('openviduintegration', 'openvidu_meet_url', '');
+		$this->config->expects($this->exactly(2))
+			->method('setAppValue');
 
 		$response = $this->controller->saveSettings('');
 
@@ -75,7 +73,9 @@ class AdminControllerTest extends TestCase {
 		$captured = null;
 		$this->config->method('setAppValue')
 			->willReturnCallback(function (string $app, string $key, string $value) use (&$captured) {
-				$captured = $value;
+				if ($key === 'openvidu_meet_url') {
+					$captured = $value;
+				}
 			});
 
 		$this->controller->saveSettings('  https://meet.example.com  ');
@@ -89,6 +89,36 @@ class AdminControllerTest extends TestCase {
 		$data = $this->controller->saveSettings('https://my-meet.example.org')->getData();
 
 		$this->assertSame('https://my-meet.example.org', $data['openvidu_meet_url']);
+	}
+
+	public function testSaveSettingsStoresApiKey(): void {
+		$capturedKey = null;
+		$this->config->method('setAppValue')
+			->willReturnCallback(function (string $app, string $key, string $value) use (&$capturedKey) {
+				if ($key === 'openvidu_api_key') {
+					$capturedKey = $value;
+				}
+			});
+
+		$response = $this->controller->saveSettings('https://meet.example.com', 'my-secret-key');
+
+		$this->assertSame(Http::STATUS_OK, $response->getStatus());
+		$this->assertSame('my-secret-key', $capturedKey);
+		$this->assertSame('my-secret-key', $response->getData()['openvidu_api_key']);
+	}
+
+	public function testSaveSettingsTrimsApiKey(): void {
+		$capturedKey = null;
+		$this->config->method('setAppValue')
+			->willReturnCallback(function (string $app, string $key, string $value) use (&$capturedKey) {
+				if ($key === 'openvidu_api_key') {
+					$capturedKey = $value;
+				}
+			});
+
+		$this->controller->saveSettings('https://meet.example.com', '  my-key  ');
+
+		$this->assertSame('my-key', $capturedKey);
 	}
 
 	public function testSaveSettingsRejectsJavascriptScheme(): void {
